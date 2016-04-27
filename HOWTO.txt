@@ -1,0 +1,20 @@
+git init # initialised .git directory
+git config --global user.name "user-name"
+git config --global user.email "user-email"
+
+
+git clone https://github.com/user/repo-name # creates the repo in current dir
+
+# cd into the repo...
+# make changes...
+git add .   # deletions should be tracked
+# OR
+git add *
+# to add files to be tracked - this does not commit any changes
+
+git commit -m "message" # commits the current snapshot
+git push origin master # pushes the repo not sure if have to do this in the repo dir
+
+# cd into the folder to update, then
+git pull # pulls and updates the local repo. note that git clone should not be used
+
