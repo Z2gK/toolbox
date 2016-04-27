@@ -13,7 +13,7 @@ git add *
 # to add files to be tracked - this does not commit any changes
 
 git commit -m "message" # commits the current snapshot
-git push origin master # pushes the repo not sure if have to do this in the repo dir
+git push origin master # pushes the repo not sure if have to do this in the repo dir - username and password will be prompted for at this point
 
 # cd into the folder to update, then
 git pull # pulls and updates the local repo. note that git clone should not be used
