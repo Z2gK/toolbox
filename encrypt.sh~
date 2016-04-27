@@ -1,5 +1,4 @@
 #!/bin/sh
-# requires openssl
 
 if [ $# = 0 ]; then
     echo "Encrypts a file using openssl and AES-256 in CBC mode"
