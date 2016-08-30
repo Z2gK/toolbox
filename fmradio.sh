@@ -1,7 +1,8 @@
 #!/bin/sh
-if [ $# -ne 1]; then
+if [ $# -ne 1 ]; then
     echo "Usage: <freq in MHz>"
     echo "E.g. 92.4"
+    exit
 fi
 
 FREQ=$1
