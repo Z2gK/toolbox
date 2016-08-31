@@ -24,11 +24,11 @@ DATESTRING=`date +%Y%m%d`
 OUTPUTFILENAME="$OUTPUTDIR"/rec"$DATESTRING".pcm
 
 rtl_fm -f "$FREQ"e6 -M wbfm -s 200000 -r 48000 $OUTPUTFILENAME &
-RTLPID=#!
+RTLPID=$!
 
 # sleep 130m # sleep for 2 hours 10 mins - for a recording of that length
 sleep 10s  # sleep for 10 seconds
-kill -s SIGTERM $RTLPID    # check if this signal is correct
+kill -15 $RTLPID    # check if this signal is correct
 echo "recording done"
 
 # aplay -r 48000 -f S16_LE
