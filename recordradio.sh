@@ -4,15 +4,17 @@
 # This script can be activated by a cron job at a certain time
 
 if [ $# -ne 2 ]; then
-    echo "Usage: <freq in MHz> <output directory>"
-    echo "E.g. 92.4 /output/directory"
+    echo "Usage: <freq in MHz> <recording duration> <output directory>"
+    echo "E.g. 92.4 10m /output/directory"
+    echo "<recording duration> should be in timeout format"
     exit
 fi
 
 # check that output directory exists
 
 FREQ=$1
-OUTPUTDIR=$2
+DURATION=$2
+OUTPUTDIR=$3
 
 # check that output directory exists
 if [ ! -d $OUTPUTDIR ]; then
@@ -29,7 +31,7 @@ OUTPUTFILENAME="$OUTPUTDIR"/rec"$DATESTRING".pcm
 #sleep 20s  # sleep for 10 seconds
 #kill -15 $RTLPID    # check if this signal is correct
 
-timeout 130m rtl_fm -f "$FREQ"e6 -M wbfm -s 200000 -r 48000 $OUTPUTFILENAME
+timeout $DURATION rtl_fm -f "$FREQ"e6 -M wbfm -s 200000 -r 48000 $OUTPUTFILENAME
 
 echo "recording done"
 
@@ -42,4 +44,4 @@ echo "recording done"
 # VISUAL=emacs crontab -e
 # Enter this crontab line
 # min(0-59) hour(0-23) dayofmonth(1-31) month(1-12) dayofweek(0-6,sun-sat) command
-# 55          20           *              *            5     $HOME/bin/recordradio.sh 98.0 <directory-to-save>
+# 55          20           *              *            5     $HOME/bin/recordradio.sh 98.0 130m <directory-to-save>
