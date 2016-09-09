@@ -35,6 +35,13 @@ timeout $DURATION rtl_fm -f "$FREQ"e6 -M wbfm -s 200000 -r 48000 $OUTPUTFILENAME
 
 echo "recording done"
 
+# For conversion to wav using ffmpeg
+# Now encoding to wav
+# echo "converting to wav"
+# WAVEFILENAME=${OUTPUTFILENAME%.pcm}.wav
+# ffmpeg -f s16le -ar 48k -ac 1 -i $OUTPUTFILENAME $WAVFILENAME
+# rm $OUTPUTFILENAME
+
 # Command to play
 # aplay -r 48000 -f S16_LE <filename>
 
