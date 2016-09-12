@@ -1,0 +1,6 @@
+http://raspberrypi.stackexchange.com/questions/45279/itead-pn532-on-pi-3-with-libnfc
+
+dtoverlay=pi3-disable-bt
+add this to /boot/config.txt then
+sudo systemctl disable hciuart
+to disable bluetooth service
