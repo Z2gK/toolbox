@@ -1,32 +1,68 @@
+import sys
 import xml.etree.ElementTree as ET
+# from urllib.request import urlopen as URLopen
+if (sys.version_info[0] == 2):
+    from urllib import urlopen as URLopen
+if (sys.version_info[0] == 3):
+    from urllib.request import urlopen as URLopen
+
 URL="http://radio.toggle.sg/static/symphony/billboard.xml"
+f = URLopen(URL)
+xmlstring = f.read()
+f.close()
 
-tree = ET.parse('nowplay.xml')
-tree.getroot()
+ofp = open("out.xml", "w")
+if (sys.version_info[0] == 2):
+    ofp.write(xmlstring)
+if (sys.version_info[0] == 3):
+    ofp.write(str(xmlstring))
 
-rt = tree.getroot()
-print (rt.tag)
+
+ofp.close()
+
+# print xmlstring
+
+# tree = ET.parse('nowplay.xml')
+# tree.getroot()
+# rt = tree.getroot()
+
+rt = ET.fromstring(xmlstring)
+# print (rt.tag)
+
+playlist = []
 
 for child in rt:
     # print child.tag, child.attrib
     x = child.attrib.get('eventType')
-    print x
+    # print x
     if (x == 'Song'):
-        print "Song detected"
+        # print "Song detected"
         for child2 in child:
             title = child2.attrib.get('title')
-            print title
+            # print title
             for child3 in child2:
                 if (child3.tag == '{urn:schemas-rcsworks-com:SongSchema}Artist'):
                     player = child3.attrib.get('name')
                 if (child3.tag == '{urn:schemas-rcsworks-com:SongSchema}Album'):
                     album = child3.attrib.get('title')
-            print player, album
+            # print player, album
             # Fill in list of triplet title, player, album    
+            playlist.append((title, player, album))
+
 
 
 # print list and format in gui
-
+# print playlist
+displaystring = ""
+for tp in playlist:
+    displaystring += tp[0]
+    displaystring += "\n"
+    displaystring += tp[1]
+    displaystring += "\n"
+    displaystring += tp[2]
+    displaystring += "\n\n"
+    
+print (displaystring)
 
 #for child in rt.findall('Event'):
 #    x = child.attrib.get('eventID')
