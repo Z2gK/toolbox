@@ -11,12 +11,13 @@ f = URLopen(URL)
 xmlstring = f.read()
 f.close()
 
-ofp = open("out.xml", "w")
+
 if (sys.version_info[0] == 2):
+    ofp = open("out.xml", "w")
     ofp.write(xmlstring)
 if (sys.version_info[0] == 3):
-    ofp.write(str(xmlstring))
-
+    ofp = open("out.xml", "w")
+    ofp.write(xmlstring.decode('utf-8'))
 
 ofp.close()
 
@@ -63,12 +64,3 @@ for tp in playlist:
     displaystring += "\n\n"
     
 print (displaystring)
-
-#for child in rt.findall('Event'):
-#    x = child.attrib.get('eventID')
-#    y = child.attrib.get('eventType')
-#    print x,y
-
-
-        
-    
