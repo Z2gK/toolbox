@@ -1,0 +1,5 @@
+# Takes an input text file containing a list of search paths
+# These paths can be absolute or relative
+# and looks for files that are duplicates, or looks for files that are not duplicates
+
+# 
