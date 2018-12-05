@@ -9,3 +9,29 @@
 # -p <pickle-file> - if specified, this script will save the duplicate file dictionary in a pickle file
 # -u - if specified, the script will output the unique files instead
 
+import os, hashlib
+import sys
+
+def file_hash(filename):
+    ''' Returns the SHA256 hash of a file.
+    The return value is a string'''
+    h = hashlib.sha256()
+    with open(filename, 'rb', buffering=0) as f:
+        for b in iter(lambda : f.read(128*1024), b''):
+            h.update(b)
+            return h.hexdigest()
+
+
+
+filename = sys.argv[1]
+thehash = file_hash(filename)
+print(thehash)
+print(type(thehash))
+
+
+
+
+# print(file_hash(filename))
+
+#for arg in sys.argv:
+#    print(arg)
