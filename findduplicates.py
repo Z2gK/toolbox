@@ -9,10 +9,10 @@
 # -p <pickle-file> - if specified, this script will save the duplicate file dictionary in a pickle file
 # -u - if specified, the script will output the unique files instead
 
-import os, hashlib
-import sys
+import os, hashlib, sys, pickle
 
-# This function may have a problem with zero byte files
+# This function may have a problem with zero byte files - Seems to be fixed
+# Reference: https://stackoverflow.com/questions/22058048/hashing-a-file-in-python
 def filehash(filename):
     ''' Returns the SHA256 hash of a file.
     The return value is a string'''
@@ -20,31 +20,29 @@ def filehash(filename):
     with open(filename, 'rb', buffering=0) as f:
         for b in iter(lambda : f.read(128*1024), b''):
             h.update(b)
-            return h.hexdigest()
+    return h.hexdigest()
 
 
 def readpathlist(fp):
     ''' Takes a file pointer as the input and goes through the paths on each line
     Returns a list of paths provided in this file
     WARNING: No error checking is implemented! '''
-    return [x.strip() for x in fp]
+    return [x.strip() for x in fp if x.strip() != ""]
         
 
 
-def duplicates(filelist):
+def duplicates(pathlist):
     ''' This function takes a list of filepaths as input and returns 
     a dictionary of information about the duplicates. 
     <key, value> = <hash of file, (list of filepaths where this occurs)>'''
     allfiles = {} # Stores a dict of all files scanned so far
     dups = {} # Stores a dict of duplicates found so far
-    for path in filelist:
+    for path in pathlist:
         for root, dirs, files in os.walk(path):
-            print("Going through " + root)
             for name in files:
                 filepath = os.path.join(root,name)
-                h = filehash(filepath) # may have a problem with zero byte files
-                print(filepath)
-                print(h)
+                h = filehash(filepath) # may have a problem with zero byte files - Fixed
+                # Deal with the edge case where one path is inside another
                 if h in allfiles:      # this file has been seen before
                     if h in dups:  # this file has been seen at least twice
                         dups[h].append(filepath)
@@ -52,23 +50,33 @@ def duplicates(filelist):
                         dups[h] = [allfiles[h], filepath]
                 else: # this file has not been seen before
                     allfiles[h] = filepath
-    return dups
+    return allfiles, dups
 
-def unique():
-    ''' For unique files '''
+def unique(pathlist):
+    ''' To find unique files '''
+    u,d = duplicates(pathlist)
+    for key in d:
+        u.pop(key)
+    return u
+    
 
-def pickledict():
-    ''' This function takes in a dictionary and a filename and saves the dictionary to the filename'''
+def pickledict(d, filename):
+    ''' This function takes in a dictionary and a filename and saves the dictionary to
+    a pickle file'''
+    fp = open(filename, "wb")
+    pickle.dump(d, fp)
+    fp.close()
 
 def printresult(d):
     ''' This function takes a dictionary as the input and prints it to standard output '''
-    for k, v in d:
+    for k, v in d.items():
+        print(k)
         for s in v:
             print(s)
-        print("\n")
+        print()
 
 filename = sys.argv[1]
-#thehash = file_hash(filename)
+#thehash = filehash(filename)
 #print(thehash)
 #print(type(thehash))
 
@@ -76,10 +84,15 @@ with open(filename, "r") as fp:
     filelist = readpathlist(fp)
 
 print(filelist)
-d = duplicates(filelist)
-print(d)
+# all,d = duplicates(filelist)
+# printresult(d)
+#pickledict(d, "dupfiles.p")
+#print(d)
 
-# print(file_hash(filename))
+u = unique(filelist)
+print(u)
+
+# print(filehash(filename))
 
 #for arg in sys.argv:
 #    print(arg)
