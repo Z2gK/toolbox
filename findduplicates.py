@@ -87,11 +87,13 @@ parser.add_argument("PATH", nargs="*", help="A single or multiple search path fo
 parser.add_argument("-p", action="store", dest="pklfilename", help="Name of pickle file for storing result.")
 parser.add_argument("-u", action="store_true", default=False, dest="uniquefiles", help="Search for unique files in search paths. If omitted, program will search for duplicates by default.")
 parser.add_argument("-l", action="store", dest="pathlistfile", help="Text file containing list of search paths. This needs to be specified if search path is not provided.")
+parser.add_argument("-n", action="store_true", default=False, dest="outputnumber", help="Print the number of duplicates/unique files identified.")
 result = parser.parse_args()
 
 print(result.pklfilename)
 print(result.uniquefiles)
 print(result.pathlistfile)
+print(result.outputnumber)
 print(result.PATH)
 
 if (result.PATH == []) and (result.pathlist == None):
@@ -121,3 +123,9 @@ if (result.pklfilename == None):
     printresult(d)
 else:
     pickledict(d, result.pklfilename)
+
+if result.outputnumber:
+    if result.uniquefiles:
+        print("{:d} unique files have been found.".format(len(d)))
+    else:
+        print("{:d} duplicates have been found.".format(len(d)))
