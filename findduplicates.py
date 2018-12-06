@@ -96,7 +96,7 @@ print(result.pathlistfile)
 print(result.outputnumber)
 print(result.PATH)
 
-if (result.PATH == []) and (result.pathlist == None):
+if (result.PATH == []) and (result.pathlistfile == None):
     print("At least one of -l or PATH needs to be specified!")
     parser.print_help()
     exit()
