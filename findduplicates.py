@@ -1,4 +1,3 @@
-# TODO: Add command line parsing functionality through argparse
 # Takes an input text file containing a list of search paths
 # These paths can be absolute or relative
 # and looks for files that are duplicates, or looks for files that are not duplicates
@@ -14,7 +13,7 @@
 # -l <list-of-filenames> - if specified, this will be a text file containing a list of paths to scan; OR
 # <path> - if specified, this will be the only path to scan for duplicates. For multiple paths, they will have to be listed in a text file
 
-import os, hashlib, sys, pickle
+import os, hashlib, sys, pickle, argparse
 
 # This function may have a problem with zero byte files - Seems to be fixed
 # Reference: https://stackoverflow.com/questions/22058048/hashing-a-file-in-python
@@ -81,14 +80,44 @@ def printresult(d):
                 print(s)
         print()
 
-filename = sys.argv[1]
+# Start of main code --------------------------------------------
+
+parser = argparse.ArgumentParser(description="A utility to search directories for duplicate or unique files.")
+parser.add_argument("PATH", nargs="*", help="A single or multiple search path for duplicates or unique files. If omitted, -l needs to be specified")
+parser.add_argument("-p", action="store", dest="pklfilename", help="Name of pickle file for storing result.")
+parser.add_argument("-u", action="store_true", default=False, dest="uniquefiles", help="Search for unique files in search paths. If omitted, program will search for duplicates by default.")
+parser.add_argument("-l", action="store", dest="pathlistfile", help="Text file containing list of search paths. This needs to be specified if search path is not provided.")
+result = parser.parse_args()
+
+print(result.pklfilename)
+print(result.uniquefiles)
+print(result.pathlistfile)
+print(result.PATH)
+
+if (result.PATH == []) and (result.pathlist == None):
+    print("At least one of -l or PATH needs to be specified!")
+    parser.print_help()
+    exit()
+
+pathlist = result.PATH
+
+if (result.pathlistfile != None):
+    with open(result.pathlistfile, "r") as fp:
+        pathlistfromfile = readpathlist(fp)
+    pathlist = pathlist + pathlistfromfile
+
+#filename = sys.argv[1]
 #thehash = filehash(filename)
 #print(thehash)
 #print(type(thehash))
 
-with open(filename, "r") as fp:
-    filelist = readpathlist(fp)
+if (result.uniquefiles):
+    d = compare(pathlist,out="uniq")
+else:
+    d = compare(pathlist,out="dup")
 
-print(filelist)
-u = compare(filelist, out="uniq")
-printresult(u)
+if (result.pklfilename == None):
+    # Print results to stdout
+    printresult(d)
+else:
+    pickledict(d, result.pklfilename)
