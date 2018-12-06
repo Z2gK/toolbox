@@ -1,3 +1,4 @@
+# TODO: Add command line parsing functionality through argparse
 # Takes an input text file containing a list of search paths
 # These paths can be absolute or relative
 # and looks for files that are duplicates, or looks for files that are not duplicates
@@ -6,8 +7,12 @@
 # Internally, this script hashes every file encountered and stores the <hash, file-path> pair in a dictionary. If duplicates are found, they will be put into another data structure - maybe another dictionary, with the <hash, filepaths> as key-value pairs
 
 # by default, if no other arguments are provided, the duplicate files are printed on standard output
-# -p <pickle-file> - if specified, this script will save the duplicate file dictionary in a pickle file
-# -u - if specified, the script will output the unique files instead
+# -p <pickle-file> - if specified, this script will save the duplicate file dictionary in a pickle file, otherwise the default behaviour is to output to stdout
+# -u - if specified, the script will search for the unique files instead, otherwise, the default is to find duplicates
+# Mandatory arguments:
+# EITHER:
+# -l <list-of-filenames> - if specified, this will be a text file containing a list of paths to scan; OR
+# <path> - if specified, this will be the only path to scan for duplicates. For multiple paths, they will have to be listed in a text file
 
 import os, hashlib, sys, pickle
 
@@ -22,19 +27,18 @@ def filehash(filename):
             h.update(b)
     return h.hexdigest()
 
-
 def readpathlist(fp):
     ''' Takes a file pointer as the input and goes through the paths on each line
     Returns a list of paths provided in this file
     WARNING: No error checking is implemented! '''
     return [x.strip() for x in fp if x.strip() != ""]
-        
 
-
-def duplicates(pathlist):
-    ''' This function takes a list of filepaths as input and returns 
-    a dictionary of information about the duplicates. 
+def compare(pathlist, out="dup"):
+    ''' This function takes a list of filepaths as input and returns
+    a dictionary of information about the duplicates.
     <key, value> = <hash of file, (list of filepaths where this occurs)>'''
+    if (out != "dup") and (out != "uniq"):
+        return None
     allfiles = {} # Stores a dict of all files scanned so far
     dups = {} # Stores a dict of duplicates found so far
     for path in pathlist:
@@ -50,15 +54,14 @@ def duplicates(pathlist):
                         dups[h] = [allfiles[h], filepath]
                 else: # this file has not been seen before
                     allfiles[h] = filepath
-    return allfiles, dups
+    # return duplicates
+    if (out == "dup"):
+        return dups
 
-def unique(pathlist):
-    ''' To find unique files '''
-    u,d = duplicates(pathlist)
-    for key in d:
-        u.pop(key)
-    return u
-    
+    # return only the unique entries
+    for key in dups:
+        allfiles.pop(key)
+    return allfiles
 
 def pickledict(d, filename):
     ''' This function takes in a dictionary and a filename and saves the dictionary to
@@ -71,8 +74,11 @@ def printresult(d):
     ''' This function takes a dictionary as the input and prints it to standard output '''
     for k, v in d.items():
         print(k)
-        for s in v:
-            print(s)
+        if type(v) == str:
+            print(v)
+        else:
+            for s in v:
+                print(s)
         print()
 
 filename = sys.argv[1]
@@ -84,15 +90,5 @@ with open(filename, "r") as fp:
     filelist = readpathlist(fp)
 
 print(filelist)
-# all,d = duplicates(filelist)
-# printresult(d)
-#pickledict(d, "dupfiles.p")
-#print(d)
-
-u = unique(filelist)
-print(u)
-
-# print(filehash(filename))
-
-#for arg in sys.argv:
-#    print(arg)
+u = compare(filelist, out="uniq")
+printresult(u)
